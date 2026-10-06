@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DailyCoin BD – Daily Reward Platform</title>
+<style>
+:root{--bg:#0b0f14;--card:#141b24;--card2:#1a2430;--line:#243242;--gold:#f5c542;--green:#2ecc71;--txt:#e8eef5;--mut:#8a9bb0}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"Segoe UI","Noto Sans Bengali",sans-serif;background:radial-gradient(1200px 600px at 80% -10%,#16301f55,transparent),var(--bg);color:var(--txt);min-height:100vh;line-height:1.5}
+button{font:inherit;cursor:pointer;border:0}
+.hidden{display:none!important}
+/* ---------- Navbar ---------- */
+nav{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:8px;padding:12px 18px;background:#0b0f14ee;backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.logo{font-weight:800;font-size:20px;color:var(--gold);cursor:pointer;user-select:none;white-space:nowrap}
+.logo span{color:var(--green)}
+.links{display:flex;gap:4px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+.links button{background:none;color:var(--mut);padding:8px 12px;border-radius:8px;white-space:nowrap;transition:.2s}
+.links button:hover,.links button.on{background:var(--card2);color:var(--txt)}
+.user{font-size:13px;color:var(--mut);white-space:nowrap}
+.user b{color:var(--green)}
+main{max-width:980px;margin:0 auto;padding:22px 16px 40px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;animation:up .5s both}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:1.2fr 1fr}
+@media(max-width:760px){.g2{grid-template-columns:1fr}.user{display:none}}
+h2{font-size:22px;margin-bottom:6px}
+h3{font-size:16px;margin-bottom:10px}
+.mut{color:var(--mut);font-size:13px}
+.btn{background:linear-gradient(135deg,var(--gold),#e0a800);color:#1a1300;font-weight:700;padding:13px 22px;border-radius:12px;transition:.2s;width:100%}
+.btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 22px #f5c54240}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.green{background:linear-gradient(135deg,var(--green),#1fa65a);color:#04200f}
+.btn.ghost{background:var(--card2);color:var(--txt);border:1px solid var(--line)}
+/* ---------- Login ---------- */
+.login{max-width:400px;margin:8vh auto 0;text-align:center}
+.login .coin{font-size:54px;animation:float 3s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-8px)}}
+input[type=text]{width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--txt);font:inherit;margin:16px 0 12px;outline:0}
+input[type=text]:focus{border-color:var(--gold)}
+/* ---------- Balance ---------- */
+.bal{background:linear-gradient(135deg,#1b2a1f,#14200f 60%,#2a2410);border-color:#33492f}
+.bal .amt{font-size:clamp(40px,9vw,60px);font-weight:800;color:var(--gold);transition:.2s}
+.bal .amt.pop{transform:scale(1.08);color:var(--green)}
+.timer{font-variant-numeric:tabular-nums;font-size:15px;margin:10px 0 14px;color:var(--green);min-height:24px}
+/* ---------- Streak ---------- */
+.dots{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:12px 0 16px}
+.dot{aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:var(--bg);border:2px dashed var(--line);color:var(--mut);font-weight:700;transition:.4s}
+.dot.done{background:linear-gradient(135deg,var(--gold),#e0a800);color:#1a1300;border:2px solid var(--gold);transform:scale(1.05)}
+.bar{height:12px;background:var(--bg);border-radius:99px;overflow:hidden;border:1px solid var(--line)}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--gold));transition:width .8s}
+/* ---------- Activity ---------- */
+.act{list-style:none;max-height:240px;overflow:auto}
+.act li{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
+.act li b{color:var(--green)}
+/* ---------- Withdraw ---------- */
+.methods{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+.method{padding:16px;border-radius:12px;background:var(--bg);border:2px solid var(--line);color:var(--txt);font-weight:700;transition:.2s}
+.method.on{border-color:var(--green);background:#12261a}
+.row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line)}
+/* ---------- Coming soon ---------- */
+.soon{text-align:center;padding:50px 20px}
+.soon .ico{font-size:56px}
+.soon h2{font-size:30px;background:linear-gradient(90deg,var(--gold),var(--green));-webkit-background-clip:text;background-clip:text;color:transparent}
+.cd{display:flex;gap:10px;justify-content:center;margin:22px 0}
+.cd div{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px 16px;min-width:70px}
+.cd b{display:block;font-size:26px;color:var(--gold)}
+.cd span{font-size:11px;color:var(--mut)}
+/* ---------- Info sections ---------- */
+.feat{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:12px}
+.feat div{background:var(--card2);border-radius:12px;padding:14px}
+.feat div b{display:block;margin-bottom:4px}
+.quote{font-size:14px}
+.quote small{color:var(--mut)}
+footer{text-align:center;color:var(--mut);font-size:13px;padding:24px 10px;border-top:1px solid var(--line)}
+/* ---------- Overlays ---------- */
+.overlay{position:fixed;inset:0;z-index:50;display:grid;place-items:center;text-align:center;padding:20px;background:var(--bg)}
+.spin{width:64px;height:64px;border:6px solid var(--line);border-top-color:var(--gold);border-radius:50%;animation:rot 1s linear infinite;margin:0 auto 18px}
+@keyframes rot{to{transform:rotate(360deg)}}
+.reveal h1{font-size:clamp(38px,10vw,72px);color:var(--gold);animation:pop .7s both}
+@keyframes pop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
+.reveal p{font-size:clamp(16px,4vw,22px);max-width:560px;margin:14px auto 24px}
+.conf{position:fixed;top:-20px;width:10px;height:14px;z-index:60;animation:fall linear forwards;pointer-events:none}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--card2);border:1px solid var(--green);padding:10px 18px;border-radius:99px;z-index:70;animation:up .3s both}
+</style>
+</head>
+<body>
+
+<!-- ============ NAVBAR ============ -->
+<nav>
+  <div class="logo" id="logo">Daily<span>Coin</span> BD</div>
+  <div class="links" id="links">
+    <button data-v="home" class="on">🏠 Home</button>
+    <button data-v="Games">🎮 Games</button>
+    <button data-v="Spin Wheel">🎡 Spin Wheel</button>
+    <button data-v="Referral">🤝 Referral</button>
+    <button data-v="Leaderboard">🏆 Leaderboard</button>
+    <button data-v="VIP">👑 VIP</button>
+    <button data-v="Support">💬 Support</button>
+  </div>
+  <div class="user hidden" id="userBox">Hi, <b id="uName"></b> · <a href="#" id="logout" style="color:var(--mut)">Logout</a></div>
+</nav>
+
+<main>
+  <!-- ============ LOGIN ============ -->
+  <section id="login" class="card login">
+    <div class="coin">🪙</div>
+    <h2>DailyCoin BD-তে স্বাগতম!</h2>
+    <p class="mut">প্রতিদিন লগইন করুন, কয়েন কালেক্ট করুন।</p>
+    <input type="text" id="uInput" maxlength="16" placeholder="আপনার ইউজারনেম লিখুন" autocomplete="off">
+    <button class="btn" id="loginBtn">শুরু করুন →</button>
+    <p class="mut" style="margin-top:12px">✔ ফ্রি জয়েন · কোনো ফি নেই</p>
+  </section>
+
+  <!-- ============ DASHBOARD ============ -->
+  <section id="home" class="hidden">
+    <div class="grid g2">
+      <div class="card bal">
+        <p class="mut">আপনার ব্যালেন্স</p>
+        <div class="amt" id="bal">৳ 0</div>
+        <div class="timer" id="timer"></div>
+        <button class="btn" id="claimBtn">🎁 ডেইলি রিওয়ার্ড নিন (+৳৫০)</button>
+        <button class="btn green" id="wdBtn" style="margin-top:10px" disabled>💸 উইথড্র</button>
+      </div>
+      <div class="card">
+        <h3>🔥 স্ট্রিক ট্র্যাকার</h3>
+        <div class="dots" id="dots"></div>
+        <div class="bar"><i id="barFill"></i></div>
+        <p class="mut" style="margin-top:8px" id="barTxt">উইথড্র করতে ৳৫০০ লাগবে</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h3>🕒 সাম্প্রতিক কার্যক্রম</h3>
+      <ul class="act" id="act"></ul>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h3>⭐ কেন DailyCoin BD?</h3>
+      <div class="feat">
+        <div><b>📅 ডেইলি রিওয়ার্ড</b><span class="mut">প্রতিদিন একবার লগইন করলেই ৳৫০।</span></div>
+        <div><b>🔒 সহজ ও নিরাপদ</b><span class="mut">শুধু ইউজারনেম, পাসওয়ার্ড লাগে না।</span></div>
+        <div><b>🚀 আরও আসছে</b><span class="mut">গেমস, স্পিন, VIP – সব শীঘ্রই।</span></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h3>💬 ইউজার রিভিউ</h3>
+      <div class="feat">
+        <div class="quote">"ইন্টারফেসটা অনেক স্মুথ, রোজ লগইন করতে ভালো লাগে!"<br><small>– রাফি, ঢাকা</small></div>
+        <div class="quote">"স্ট্রিক বারটা দেখে মোটিভেশন পাই।"<br><small>– নুসরাত, টাঙ্গাইল</small></div>
+        <div class="quote">"বন্ধুদের সাথে কম্পিটিশন করছি 😄"<br><small>– তানভীর, সিলেট</small></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ COMING SOON ============ -->
+  <section id="soon" class="card soon hidden">
+    <div class="ico">🚧</div>
+    <h2 id="soonTitle">Coming Soon</h2>
+    <p class="mut">Coming Soon – ১ মাসের মধ্যে চালু হচ্ছে</p>
+    <div class="cd">
+      <div><b id="cdD">30</b><span>দিন</span></div>
+      <div><b id="cdH">00</b><span>ঘণ্টা</span></div>
+      <div><b id="cdM">00</b><span>মিনিট</span></div>
+      <div><b id="cdS">00</b><span>সেকেন্ড</span></div>
+    </div>
+    <button class="btn ghost" style="max-width:240px" onclick="show('home')">← হোমে ফিরুন</button>
+  </section>
+
+  <!-- ============ WITHDRAW ============ -->
+  <section id="wd" class="card hidden" style="max-width:480px;margin:0 auto">
+    <h2>💸 উইথড্র</h2>
+    <p class="mut">পেমেন্ট মেথড বেছে নিন</p>
+    <div class="methods">
+      <button class="method on" data-m="bKash">bKash</button>
+      <button class="method" data-m="Nagad">Nagad</button>
+    </div>
+    <div class="row"><span class="mut">পরিমাণ</span><b>৳ ৫০০</b></div>
+    <div class="row"><span class="mut">মেথড</span><b id="wdMethod">bKash</b></div>
+    <button class="btn green" id="confirmBtn" style="margin-top:16px">উইথড্র কনফার্ম করুন</button>
+    <button class="btn ghost" style="margin-top:10px" onclick="show('home')">বাতিল</button>
+  </section>
+</main>
+
+<footer>© 2026 DailyCoin BD · সর্বস্বত্ব সংরক্ষিত</footer>
+
+<!-- ============ OVERLAYS ============ -->
+<div class="overlay hidden" id="processing"><div><div class="spin"></div><h2>প্রসেসিং হচ্ছে...</h2><p class="mut">অনুগ্রহ করে একটু অপেক্ষা করুন</p></div></div>
+<div class="overlay reveal hidden" id="reveal"><div>
+  <h1>PRANK! 🎉</h1>
+  <p>এটা শুভর বানানো প্রাঙ্ক ওয়েবসাইট। কোনো আসল টাকা নেই। তোমরা সবাই ফ্রেশ!</p>
+  <button class="btn" style="max-width:260px" id="backBtn">← ফিরে যান</button>
+</div></div>
+
+<script>
+/* ================= CONFIG ================= */
+const REWARD = 50, GOAL = 500, DAY = 24 * 60 * 60 * 1000;
+const $ = id => document.getElementById(id);
+
+/* ================= STORAGE ================= */
+// All data lives only in this browser's localStorage.
+function loadDB(){ try { return JSON.parse(localStorage.getItem('dcbd_db')) || {}; } catch(e){ return {}; } }
+function saveDB(db){ localStorage.setItem('dcbd_db', JSON.stringify(db)); }
+function getUser(){
+  const name = localStorage.getItem('dcbd_current');
+  if(!name) return null;
+  const db = loadDB();
+  if(!db[name]) db[name] = { balance:0, lastClaim:0, history:[] };
+  return { name, data: db[name], db };
+}
+function saveUser(u){ u.db[u.name] = u.data; saveDB(u.db); }
+
+/* ================= NAVIGATION ================= */
+const views = ['login','home','soon','wd'];
+function show(v){
+  views.forEach(x => $(x).classList.toggle('hidden', x !== v));
+  document.querySelectorAll('#links button').forEach(b => b.classList.toggle('on', b.dataset.v === (v === 'home' ? 'home' : $('soonTitle').textContent)));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function showSoon(name){
+  $('soonTitle').textContent = name;
+  show('soon');
+}
+
+/* ================= LOGIN ================= */
+function login(){
+  const name = $('uInput').value.trim().replace(/[<>]/g,'');
+  if(name.length < 2) return toast('কমপক্ষে ২টি অক্ষর দিন');
+  localStorage.setItem('dcbd_current', name);
+  initApp();
+}
+function logout(e){
+  e.preventDefault();
+  localStorage.removeItem('dcbd_current');
+  $('userBox').classList.add('hidden');
+  show('login');
+}
+
+/* ================= BALANCE ANIMATION ================= */
+let shown = 0;
+function animateBalance(to){
+  const from = shown, start = performance.now(), dur = 900;
+  const el = $('bal');
+  el.classList.add('pop');
+  (function step(t){
+    const p = Math.min((t - start) / dur, 1);
+    shown = Math.round(from + (to - from) * p);
+    el.textContent = '৳ ' + shown;
+    if(p < 1) requestAnimationFrame(step); else el.classList.remove('pop');
+  })(start);
+}
+
+/* ================= RENDER DASHBOARD ================= */
+function render(animate){
+  const u = getUser(); if(!u) return;
+  const b = u.data.balance, days = u.data.history.length;
+  if(animate) animateBalance(b); else { shown = b; $('bal').textContent = '৳ ' + b; }
+
+  // streak dots
+  $('dots').innerHTML = Array.from({length:10}, (_,i) =>
+    `<div class="dot ${i < days ? 'done' : ''}">${i < days ? '✓' : i + 1}</div>`).join('');
+
+  // progress bar
+  const pct = Math.min(b / GOAL * 100, 100);
+  $('barFill').style.width = pct + '%';
+  $('barTxt').textContent = b >= GOAL ? '🎉 ৳৫০০ পূর্ণ! এবার উইথড্র করতে পারবেন।' : `উইথড্র করতে ৳${GOAL} লাগবে (৳${b} / ৳${GOAL})`;
+
+  // withdraw button
+  $('wdBtn').disabled = b < GOAL;
+
+  // activity list
+  $('act').innerHTML = u.data.history.length
+    ? u.data.history.slice().reverse().map(h =>
+        `<li><span>ডেইলি রিওয়ার্ড · ${new Date(h.t).toLocaleString('bn-BD',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</span><b>+৳${h.amt}</b></li>`).join('')
+    : '<li><span class="mut">এখনো কোনো কার্যক্রম নেই। প্রথম রিওয়ার্ড নিন!</span></li>';
+  tick();
+}
+
+/* ================= CLAIM + TIMER ================= */
+function claim(){
+  const u = getUser(); if(!u) return;
+  if(u.data.balance >= GOAL) return toast('টার্গেট পূর্ণ! এবার উইথড্র করুন।');
+  if(Date.now() - u.data.lastClaim < DAY) return;
+  u.data.lastClaim = Date.now();
+  u.data.balance += REWARD;
+  u.data.history.push({ t: Date.now(), amt: REWARD });
+  saveUser(u);
+  render(true);
+  toast('+৳৫০ যোগ হয়েছে! 🎉');
+}
+function tick(){
+  const u = getUser(); if(!u) return;
+  const left = DAY - (Date.now() - u.data.lastClaim);
+  const btn = $('claimBtn');
+  if(u.data.balance >= GOAL){
+    $('timer').textContent = '✅ সব রিওয়ার্ড কালেক্ট হয়েছে';
+    btn.disabled = true; return;
+  }
+  if(left > 0 && u.data.lastClaim){
+    const p = n => String(n).padStart(2,'0');
+    const s = Math.floor(left/1000);
+    $('timer').textContent = `পরবর্তী রিওয়ার্ড: ${p(Math.floor(s/3600))}:${p(Math.floor(s%3600/60))}:${p(s%60)}`;
+    btn.disabled = true;
+  } else {
+    $('timer').textContent = '✨ রিওয়ার্ড রেডি!';
+    btn.disabled = false;
+  }
+}
+
+/* ================= HIDDEN TEST TOOL ================= */
+// Triple-click the logo => pretend one day passed (moves last-claim 24h back).
+let clicks = [];
+function logoClick(){
+  const now = Date.now();
+  clicks = clicks.filter(t => now - t < 700); clicks.push(now);
+  if(clicks.length >= 3){
+    clicks = [];
+    const u = getUser(); if(!u || !u.data.lastClaim) return;
+    u.data.lastClaim -= DAY;
+    saveUser(u); tick(); toast('⏩ +1 din fast-forward');
+  }
+}
+
+/* ================= WITHDRAW FLOW ================= */
+let method = 'bKash';
+function confirmWithdraw(){
+  $('processing').classList.remove('hidden');
+  setTimeout(() => {
+    $('processing').classList.add('hidden');
+    $('reveal').classList.remove('hidden');
+    confetti();
+  }, 3000);
+}
+function confetti(){
+  const colors = ['#f5c542','#2ecc71','#e74c3c','#3498db','#9b59b6','#fff'];
+  for(let i = 0; i < 90; i++){
+    const c = document.createElement('div');
+    c.className = 'conf';
+    c.style.left = Math.random()*100 + 'vw';
+    c.style.background = colors[i % colors.length];
+    c.style.animationDuration = (2 + Math.random()*3) + 's';
+    c.style.animationDelay = Math.random()*1.2 + 's';
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 6500);
+  }
+}
+
+/* ================= COMING SOON COUNTDOWN ================= */
+// Fixed 30-day target, stored once so it doesn't reset on every visit.
+function soonTick(){
+  let target = +localStorage.getItem('dcbd_soon');
+  if(!target){ target = Date.now() + 30*DAY; localStorage.setItem('dcbd_soon', target); }
+  const s = Math.max(0, Math.floor((target - Date.now())/1000)), p = n => String(n).padStart(2,'0');
+  $('cdD').textContent = p(Math.floor(s/86400));
+  $('cdH').textContent = p(Math.floor(s%86400/3600));
+  $('cdM').textContent = p(Math.floor(s%3600/60));
+  $('cdS').textContent = p(s%60);
+}
+
+/* ================= UTIL ================= */
+function toast(msg){
+  const t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2200);
+}
+
+/* ================= INIT ================= */
+function initApp(){
+  const u = getUser();
+  if(!u){ show('login'); return; }
+  $('uName').textContent = u.name;
+  $('userBox').classList.remove('hidden');
+  show('home'); render(false);
+}
+$('loginBtn').onclick = login;
+$('uInput').addEventListener('keydown', e => { if(e.key === 'Enter') login(); });
+$('logout').onclick = logout;
+$('logo').onclick = logoClick;
+$('claimBtn').onclick = claim;
+$('wdBtn').onclick = () => show('wd');
+$('confirmBtn').onclick = confirmWithdraw;
+$('backBtn').onclick = () => { $('reveal').classList.add('hidden'); show('home'); };
+document.querySelectorAll('.method').forEach(b => b.onclick = () => {
+  document.querySelectorAll('.method').forEach(x => x.classList.remove('on'));
+  b.classList.add('on'); method = b.dataset.m; $('wdMethod').textContent = method;
+});
+$('links').addEventListener('click', e => {
+  const b = e.target.closest('button'); if(!b) return;
+  if(!getUser()) return toast('আগে লগইন করুন');
+  b.dataset.v === 'home' ? show('home') : showSoon(b.dataset.v);
+});
+setInterval(() => { tick(); soonTick(); }, 1000);
+soonTick(); initApp();
+</script>
+</body>
+</html>
